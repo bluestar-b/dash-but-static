@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Dashboard</title>
+  <style>
+    body {
+      font-family: monospace;
+      margin: 10px;
+      background-color: #000;
+      color: #FFFFFF;
+    }
+
+    .scroll-container {
+      overflow-x: auto;
+      margin-bottom: 20px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #FFF;
+    }
+
+    th,
+    td {
+      padding: 5px;
+      text-align: left;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .core {
+      flex: 1 1 calc(10% - 10px);
+      margin: 5px;
+      padding: 5px;
+      background-color: #7A7A7A;
+      border: 1px solid #fff;
+    }
+
+    .core span {
+      display: block;
+    }
+
+    .process-table th {
+      background-color: #7A7A7A;
+    }
+
+    h2 {
+      border-bottom: 2px solid #FFFFFF;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Server Dashboard</h1>
+
+
+  <h2>System Overview</h2>
+  <table id="system-overview-table">
+    <tr>
+      <th>Hostname</th>
+      <td id="hostname">-</td>
+    </tr>
+    <tr>
+      <th>Uptime</th>
+      <td id="uptime">-</td>
+    </tr>
+    <tr>
+      <th>Platform</th>
+      <td id="platform">-</td>
+    </tr>
+    <tr>
+      <th>Total Processes</th>
+      <td id="process-count">-</td>
+    </tr>
+  </table>
+
+
+  <h2>Load Averages</h2>
+  <table id="load-table">
+    <tr>
+      <th>1 Minute</th>
+      <th>5 Minutes</th>
+      <th>15 Minutes</th>
+    </tr>
+    <tr>
+      <td id="load1">-</td>
+      <td id="load5">-</td>
+      <td id="load15">-</td>
+    </tr>
+  </table>
+
+
+  <h2>CPU Information</h2>
+  <table id="cpu-info-table">
+    <tr>
+      <th>CPU Name</th>
+      <td id="cpu-name">-</td>
+    </tr>
+    <tr>
+      <th>Speed</th>
+      <td id="cpu-speed">-</td>
+    </tr>
+    <tr>
+      <th>Physical Cores</th>
+      <td id="cpu-physical">-</td>
+    </tr>
+    <tr>
+      <th>Logical Cores</th>
+      <td id="cpu-logical">-</td>
+    </tr>
+    <tr>
+      <th>Overall Utilization</th>
+      <td id="overall-utilization">-</td>
+    </tr>
+  </table>
+
+
+  <h2>Per-CPU Utilization</h2>
+  <div class="container" id="cpu-container"></div>
+
+
+
+
+  <h2>Memory usage</h2>
+  <table id="memory-table">
+    <tr>
+      <th>Memory Usage</th>
+      <td id="memory-info">-</td>
+    </tr>
+  </table>
+
+  <h2>Disk usage</h2>
+  <table id="disk-table">
+
+    <tr>
+      <th>Disk Usage</th>
+      <td id="disk-usage">-</td>
+    </tr>
+  </table>
+
+  <h2>Network I/O</h2>
+  <table id="network-io-table">
+    <tr>
+      <th>Bytes Sent</th>
+      <td id="net-sent">-</td>
+      <th>Bytes Received</th>
+      <td id="net-recv">-</td>
+    </tr>
+    <tr>
+      <th>Packets Sent</th>
+      <td id="net-pkts-sent">-</td>
+      <th>Packets Received</th>
+      <td id="net-pkts-recv">-</td>
+    </tr>
+  </table>
+
+
+
+<!--
+Upcoming feature
+  <h2>Disk Usage</h2>
+
+
+  <div class="scroll-container">
+    <table class="disk-table">
+      <thead>
+        <tr>
+          <th>Disk Name</th>
+          <th>Mount Point</th>
+          <th>Total Size</th>
+          <th>Used Space</th>
+          <th>Free Space</th>
+          <th>Usage (%)</th>
+          <th>Read Count</th>
+          <th>Write Count</th>
+          <th>Read Bytes</th>
+          <th>Write Bytes</th>
+          <th>Read Time (ms)</th>
+          <th>Write Time (ms)</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td>sda</td>
+          <td>/home</td>
+          <td>256 GB</td>
+          <td>128 GB</td>
+          <td>128 GB</td>
+          <td>50.00%</td>
+          <td>12,000</td>
+          <td>8,000</td>
+          <td>750 MB</td>
+          <td>450 MB</td>
+          <td>150 ms</td>
+          <td>100 ms</td>
+        </tr>
+
+        <tr>
+          <td>sdb</td>
+          <td>500 GB</td>
+          <td>100 GB</td>
+          <td>400 GB</td>
+          <td>20.00%</td>
+          <td>5,000</td>
+          <td>3,000</td>
+          <td>300 MB</td>
+          <td>200 MB</td>
+          <td>80 ms</td>
+          <td>50 ms</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  -->
+
+  <h2>Top Processes (CPU above 0.1%)</h2>
+  <table class="process-table">
+    <tr>
+      <th>PID</th>
+      <th>Name</th>
+      <th>CPU (%)</th>
+    </tr>
+    <tbody id="process-table"></tbody>
+  </table>
+
+  <script>
+    function formatSize(value) {
+      const units = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+      let unitIndex = 0;
+
+      while (value >= 1000 && unitIndex < units.length - 1) {
+        value /= 1000;
+        unitIndex++;
+      }
+
+      return value.toFixed(2) + ' ' + units[unitIndex];
+    }
+
+    const ws = new WebSocket('wss://mizukiws.notmycode.dev');
+
+    ws.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      document.getElementById('hostname').textContent = data.host.hostname;
+      document.getElementById('uptime').textContent = (data.host.uptime / 3600).toFixed(2) + ' hours';
+      document.getElementById('platform').textContent = data.host.platform;
+      document.getElementById('process-count').textContent = data.host.process_count;
+
+
+      document.getElementById('load1').textContent = data.load.load1.toFixed(2);
+      document.getElementById('load5').textContent = data.load.load5.toFixed(2);
+      document.getElementById('load15').textContent = data.load.load15.toFixed(2);
+
+
+      document.getElementById('cpu-name').textContent = data.cpu_info.name;
+      document.getElementById('cpu-speed').textContent = data.cpu_info.speed_mhz + ' MHz';
+      document.getElementById('cpu-physical').textContent = data.cpu_count_physical;
+      document.getElementById('cpu-logical').textContent = data.cpu_count_logical;
+      document.getElementById('overall-utilization').textContent = data.overall_utilization.toFixed(2) + '%';
+
+
+      const cpuContainer = document.getElementById('cpu-container');
+      cpuContainer.innerHTML = '';
+      data.cpu_utilization.forEach(cpu => {
+        const coreDiv = document.createElement('div');
+        coreDiv.className = 'core';
+        coreDiv.innerHTML = `<span>CPU ${cpu.number}</span><span>${cpu.percent.toFixed(2)}%</span>`;
+        cpuContainer.appendChild(coreDiv);
+      });
+
+
+      document.getElementById('memory-info').textContent =
+        `${formatSize(data.memory_usage.used)} / ${formatSize(data.memory_usage.total)} (${data.memory_usage.percent}%)`;
+      document.getElementById('disk-usage').textContent =
+        `${formatSize(data.disk_usage.used)} / ${formatSize(data.disk_usage.total)} (${data.disk_usage.percent}%)`;
+
+
+      document.getElementById('net-sent').textContent = formatSize(data.net_io.bytes_sent);
+      document.getElementById('net-recv').textContent = formatSize(data.net_io.bytes_recv);
+      document.getElementById('net-pkts-sent').textContent = data.net_io.packets_sent;
+      document.getElementById('net-pkts-recv').textContent = data.net_io.packets_recv;
+
+
+      const processTable = document.getElementById('process-table');
+      processTable.innerHTML = '';
+
+      data.processes
+        .sort((a, b) => b.cpu_percent - a.cpu_percent)
+        .forEach(process => {
+          const row = `<tr>
+                                <td>${process.pid}</td>
+                                <td>${process.name}</td>
+                                <td>${process.cpu_percent.toFixed(2)}%</td>
+                            </tr>`;
+          processTable.insertAdjacentHTML('beforeend', row);
+        });
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+  </script>
+
+
+</body>
+
+</html>
