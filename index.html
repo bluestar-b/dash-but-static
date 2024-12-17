@@ -68,7 +68,6 @@
 <body>
   <h1>Server Dashboard</h1>
 
-
   <h2>System Overview</h2>
   <table id="system-overview-table">
     <tr>
@@ -89,7 +88,6 @@
     </tr>
   </table>
 
-
   <h2>Load Averages</h2>
   <table id="load-table">
     <tr>
@@ -103,7 +101,6 @@
       <td id="load15">-</td>
     </tr>
   </table>
-
 
   <h2>CPU Information</h2>
   <table id="cpu-info-table">
@@ -129,12 +126,8 @@
     </tr>
   </table>
 
-
   <h2>Per-CPU Utilization</h2>
   <div class="container" id="cpu-container"></div>
-
-
-
 
   <h2>Memory usage</h2>
   <table id="memory-table">
@@ -145,90 +138,38 @@
   </table>
 
   <h2>Disk usage</h2>
+  
+    <div class="scroll-container">
   <table id="disk-table">
-
-    <tr>
-      <th>Disk Usage</th>
-      <td id="disk-usage">-</td>
-    </tr>
+    <thead>
+      <tr>
+        <th>Disk Name</th>
+        <th>Mount Point</th>
+        <th>Total Size</th>
+        <th>Used Space</th>
+        <th>Free Space</th>
+        <th>Usage (%)</th>
+      </tr>
+    </thead>
+    <tbody id="disk-body"></tbody>
   </table>
+</div>
 
   <h2>Network I/O</h2>
-  <table id="network-io-table">
-    <tr>
-      <th>Bytes Sent</th>
-      <td id="net-sent">-</td>
-      <th>Bytes Received</th>
-      <td id="net-recv">-</td>
-    </tr>
-    <tr>
-      <th>Packets Sent</th>
-      <td id="net-pkts-sent">-</td>
-      <th>Packets Received</th>
-      <td id="net-pkts-recv">-</td>
-    </tr>
+    <div class="scroll-container">
+  <table id="network-io-table" class="scroll-container">
+    <thead>
+      <tr>
+        <th>Interface</th>
+        <th>Bytes Sent</th>
+        <th>Bytes Received</th>
+        <th>Packets Sent</th>
+        <th>Packets Received</th>
+      </tr>
+    </thead>
+    <tbody id="network-body"></tbody>
   </table>
-
-
-
-<!--
-Upcoming feature
-  <h2>Disk Usage</h2>
-
-
-  <div class="scroll-container">
-    <table class="disk-table">
-      <thead>
-        <tr>
-          <th>Disk Name</th>
-          <th>Mount Point</th>
-          <th>Total Size</th>
-          <th>Used Space</th>
-          <th>Free Space</th>
-          <th>Usage (%)</th>
-          <th>Read Count</th>
-          <th>Write Count</th>
-          <th>Read Bytes</th>
-          <th>Write Bytes</th>
-          <th>Read Time (ms)</th>
-          <th>Write Time (ms)</th>
-        </tr>
-      </thead>
-      <tbody>
-
-        <tr>
-          <td>sda</td>
-          <td>/home</td>
-          <td>256 GB</td>
-          <td>128 GB</td>
-          <td>128 GB</td>
-          <td>50.00%</td>
-          <td>12,000</td>
-          <td>8,000</td>
-          <td>750 MB</td>
-          <td>450 MB</td>
-          <td>150 ms</td>
-          <td>100 ms</td>
-        </tr>
-
-        <tr>
-          <td>sdb</td>
-          <td>500 GB</td>
-          <td>100 GB</td>
-          <td>400 GB</td>
-          <td>20.00%</td>
-          <td>5,000</td>
-          <td>3,000</td>
-          <td>300 MB</td>
-          <td>200 MB</td>
-          <td>80 ms</td>
-          <td>50 ms</td>
-        </tr>
-      </tbody>
-    </table>
-
-  </div>
-  -->
+</div>
 
   <h2>Top Processes (CPU above 0.1%)</h2>
   <table class="process-table">
@@ -267,18 +208,15 @@ Upcoming feature
       document.getElementById('platform').textContent = data.host.platform;
       document.getElementById('process-count').textContent = data.host.process_count;
 
-
       document.getElementById('load1').textContent = data.load.load1.toFixed(2);
       document.getElementById('load5').textContent = data.load.load5.toFixed(2);
       document.getElementById('load15').textContent = data.load.load15.toFixed(2);
-
 
       document.getElementById('cpu-name').textContent = data.cpu_info.name;
       document.getElementById('cpu-speed').textContent = data.cpu_info.speed_mhz + ' MHz';
       document.getElementById('cpu-physical').textContent = data.cpu_count_physical;
       document.getElementById('cpu-logical').textContent = data.cpu_count_logical;
       document.getElementById('overall-utilization').textContent = data.overall_utilization.toFixed(2) + '%';
-
 
       const cpuContainer = document.getElementById('cpu-container');
       cpuContainer.innerHTML = '';
@@ -289,22 +227,42 @@ Upcoming feature
         cpuContainer.appendChild(coreDiv);
       });
 
-
       document.getElementById('memory-info').textContent =
         `${formatSize(data.memory_usage.used)} / ${formatSize(data.memory_usage.total)} (${data.memory_usage.percent}%)`;
-      document.getElementById('disk-usage').textContent =
-        `${formatSize(data.disk_usage.used)} / ${formatSize(data.disk_usage.total)} (${data.disk_usage.percent}%)`;
 
 
-      document.getElementById('net-sent').textContent = formatSize(data.net_io.bytes_sent);
-      document.getElementById('net-recv').textContent = formatSize(data.net_io.bytes_recv);
-      document.getElementById('net-pkts-sent').textContent = data.net_io.packets_sent;
-      document.getElementById('net-pkts-recv').textContent = data.net_io.packets_recv;
+      const sortedDiskUsage = data.disk_usage.sort((a, b) => a.disk.localeCompare(b.disk));
+      const diskBody = document.getElementById('disk-body');
+      diskBody.innerHTML = '';
+      sortedDiskUsage.forEach(disk => {
+        const row = `<tr>
+          <td>${disk.disk}</td>
+          <td>${disk.mountpoint}</td>
+          <td>${formatSize(disk.total_size)}</td>
+          <td>${formatSize(disk.used_space)}</td>
+          <td>${formatSize(disk.free_space)}</td>
+          <td>${disk.usage.toFixed(2)}%</td>
+        </tr>`;
+        diskBody.insertAdjacentHTML('beforeend', row);
+      });
 
+
+      const sortedNetIo = data.net_io.sort((a, b) => a.interface.localeCompare(b.interface));
+      const networkBody = document.getElementById('network-body');
+      networkBody.innerHTML = '';
+      sortedNetIo.forEach(net => {
+        const row = `<tr>
+          <td>${net.interface}</td>
+          <td>${formatSize(net.bytes_sent)}</td>
+          <td>${formatSize(net.bytes_recv)}</td>
+          <td>${net.packets_sent}</td>
+          <td>${net.packets_recv}</td>
+        </tr>`;
+        networkBody.insertAdjacentHTML('beforeend', row);
+      });
 
       const processTable = document.getElementById('process-table');
       processTable.innerHTML = '';
-
       data.processes
         .sort((a, b) => b.cpu_percent - a.cpu_percent)
         .forEach(process => {
@@ -325,8 +283,6 @@ Upcoming feature
       console.error('WebSocket error:', error);
     };
   </script>
-
-
 </body>
 
 </html>
